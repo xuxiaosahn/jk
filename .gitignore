@@ -1,0 +1,10 @@
+target/classes/com/seeyon/apps/jk/JkPluginInitializer.class
+target/classes/com/seeyon/apps/jk/controller/JkController.class
+target/classes/com/seeyon/apps/jk/job/TestQuartz.class
+target/classes/com/seeyon/apps/jk/job/TestQuartz2.class
+target/classes/com/seeyon/apps/jk/manager/JkManager.class
+target/classes/com/seeyon/apps/jk/vo/QuartzJobsVO.class
+target/m2e-wtp/web-resources/META-INF/MANIFEST.MF
+target/m2e-wtp/web-resources/META-INF/maven/com.seeyon/jk/pom.properties
+target/m2e-wtp/web-resources/META-INF/maven/com.seeyon/jk/pom.xml
+target/test-classes/com/seeyon/test/jk/Test.class
