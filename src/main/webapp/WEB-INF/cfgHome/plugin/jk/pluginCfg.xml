@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+	<id>jk</id>
+	<name>jk quartz 定时调度管理插件</name>
+	<category>20210725</category>
+</plugin>

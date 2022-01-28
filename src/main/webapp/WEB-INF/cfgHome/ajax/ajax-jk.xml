@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<bean>
+		<serviceName>jkManager</serviceName>
+		<operations>
+			<op>getJkList</op>
+			<op>jobPause</op>
+			<op>jobresume</op>
+			<op>addJob</op>
+			<op>jobreschedule</op>
+		</operations>
+	</bean>
+</beans>

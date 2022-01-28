@@ -1,0 +1,23 @@
+@charset "UTF-8";
+
+/**
+ * 列表
+ */
+#table-warp {
+	position: absolute;
+	top: 40px;
+	width: 100%;
+	bottom: 0px;
+	overflow: hidden;
+}
+
+/**
+ * 编辑页面
+ */
+.row_div.display_none {
+	display: none;
+}
+
+.required {
+	color: red;
+}
