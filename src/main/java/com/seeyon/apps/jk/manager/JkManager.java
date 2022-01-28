@@ -1,6 +1,8 @@
 package com.seeyon.apps.jk.manager;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +23,7 @@ import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.matchers.GroupMatcher;
 
 import com.seeyon.apps.jk.vo.QuartzJobsVO;
+import com.seeyon.ctp.common.quartz.QuartzHolder;
 import com.seeyon.ctp.common.quartz.QuartzJobProxy;
 import com.seeyon.ctp.common.quartz.QuartzListener;
 import com.seeyon.ctp.util.FlipInfo;
@@ -112,6 +115,7 @@ public class JkManager {
 	 * @throws Exception
 	 */
 	public boolean addJob(String jobClassName, String jobGroupName, String cronExpression) throws Exception {
+		/**
 		// 构建job信息
 		JobDetail jobDetail = JobBuilder.newJob(getClass(jobClassName).getClass())
 				.withIdentity(jobClassName, jobGroupName).build();
@@ -123,9 +127,11 @@ public class JkManager {
 		try {
 			scheduler.scheduleJob(jobDetail, trigger);
 		} catch (SchedulerException e) {
-			System.out.println("创建定时任务失败" + e);
 			throw new Exception("创建定时任务失败");
 		}
+		*/
+		QuartzHolder.newCronQuartzJob(jobGroupName, jobClassName, cronExpression,
+                new Date(), null, jobClassName, new HashMap<String, String>());
 		return true;
 	}
 	
