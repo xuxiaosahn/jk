@@ -18,9 +18,9 @@
 		<property name="jobGroup" column="JOB_GROUP" type="string" not-null="false" length="255" />
 		<property name="triggerName" column="TRIGGER_NAME" type="string" not-null="false" length="255" />
 		<property name="triggerGroup" column="TRIGGER_GROUP" type="string" not-null="false" length="255" />
-		<property name="memberId" column="MEMBERID" type="Long" not-null="false" length="40" />
+		<property name="memberId" column="MEMBERID" type="long" not-null="false" length="40" />
 		<property name="createDate" column="CREATE_DATE" type="timestamp" not-null="false" length="20" />
-		<property name="modifyId" column="MODIFYID" type="Long" not-null="false" length="40" />
+		<property name="modifyId" column="MODIFYID" type="long" not-null="false" length="40" />
 		<property name="modifyDate" column="MODIFY_DATE" type="timestamp" not-null="false" length="20" />
 		<property name="deleted" column="DELETED" type="integer" not-null="false" length="4" />
 	</class>
