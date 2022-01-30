@@ -1,9 +1,9 @@
 package com.seeyon.apps.jk.po;
 
+import com.seeyon.ctp.common.po.BasePO;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import com.seeyon.ctp.common.po.BasePO;
 
 /**
  * 
@@ -68,6 +68,10 @@ public class JkJob extends BasePO implements Serializable{
 	 * 更新时间
 	 */
 	private Date modifyDate;
+	/**
+	 * 是否删除
+	 */
+	private Boolean isDeleted;
 	
 	public String getJkJobName() {
 		return jkJobName;
@@ -135,6 +139,10 @@ public class JkJob extends BasePO implements Serializable{
 	public void setModifyDate(Date modifyDate) {
 		this.modifyDate = modifyDate;
 	}
-	
-	
+	public Boolean getDeleted() {
+		return isDeleted;
+	}
+	public void setDeleted(Boolean deleted) {
+		isDeleted = deleted;
+	}
 }

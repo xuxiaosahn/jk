@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <!-- JOB表 -->
+    <class name="com.seeyon.apps.jk.po.JkJobLog" table="JK_JOB_LOG" lazy="false">
+
+        <id name="id" type="long" column="ID">
+            <generator class="assigned" />
+        </id>
+
+        <property name="jobId" column="JOB_ID" type="Long" not-null="true" length="255" />
+        <property name="startTime" column="START_TIME" type="timestamp" not-null="false" length="40" />
+        <property name="endTime" column="END_TIME" type="timestamp" not-null="false" length="40" />
+        <property name="manual" column="MANUAL" type="integer" not-null="false" length="4" />
+        <property name="ExecuteStatus" column="EXECUTE_STATUS" type="integer" not-null="false" length="4" />
+        <property name="deleted" column="DELETED" type="integer" not-null="false" length="4" />
+    </class>
+</hibernate-mapping>
