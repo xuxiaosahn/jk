@@ -31,7 +31,7 @@ public class JkJob extends BasePO implements Serializable{
 	/**
 	 * 任务类型
 	 */
-	private JkJobType jkJobType;
+	private Integer jkJobType;
 	/**
 	 * 调度器名称
 	 */
@@ -79,10 +79,10 @@ public class JkJob extends BasePO implements Serializable{
 	public void setJkJobName(String jkJobName) {
 		this.jkJobName = jkJobName;
 	}
-	public JkJobType getJkJobType() {
+	public Integer getJkJobType() {
 		return jkJobType;
 	}
-	public void setJkJobType(JkJobType jkJobType) {
+	public void setJkJobType(Integer jkJobType) {
 		this.jkJobType = jkJobType;
 	}
 	public String getSchedName() {

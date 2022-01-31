@@ -1,32 +1,19 @@
 package com.seeyon.apps.jk.manager;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.seeyon.apps.jk.po.JkJob;
+import com.seeyon.apps.jk.po.JkJobType;
+import com.seeyon.apps.jk.vo.QuartzJobsVO;
+import com.seeyon.ctp.common.AppContext;
+import com.seeyon.ctp.common.quartz.QuartzListener;
+import com.seeyon.ctp.util.DBAgent;
+import com.seeyon.ctp.util.FlipInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.CronTrigger;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
+import org.quartz.*;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.matchers.GroupMatcher;
 
-import com.seeyon.apps.jk.vo.QuartzJobsVO;
-import com.seeyon.ctp.common.quartz.QuartzHolder;
-import com.seeyon.ctp.common.quartz.QuartzJobProxy;
-import com.seeyon.ctp.common.quartz.QuartzListener;
-import com.seeyon.ctp.util.FlipInfo;
+import java.util.*;
 
 public class JkManager {
 	private static Log LOG = LogFactory.getLog(JkManager.class);
@@ -114,25 +101,45 @@ public class JkManager {
 	 * @param cronExpression
 	 * @throws Exception
 	 */
-	public boolean addJob(String jobClassName, String jobGroupName, String cronExpression) throws Exception {
-		/**
+	public Map<String,Object> addJob(String jobClassName, String jobGroupName, String cronExpression) throws Exception {
+		Map<String,Object> res = new HashMap<>();
 		// 构建job信息
-		JobDetail jobDetail = JobBuilder.newJob(getClass(jobClassName).getClass())
-				.withIdentity(jobClassName, jobGroupName).build();
-		// 表达式调度构建器(即任务执行的时间)
-		CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
-		// 按新的cronExpression表达式构建一个新的trigger
-		CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobClassName, jobGroupName)
-				.withSchedule(scheduleBuilder).build();
 		try {
-			scheduler.scheduleJob(jobDetail, trigger);
-		} catch (SchedulerException e) {
-			throw new Exception("创建定时任务失败");
+			JobDetail jobDetail = JobBuilder.newJob(getClass(jobClassName))
+					.withIdentity(jobClassName, jobGroupName).build();
+			// 表达式调度构建器(即任务执行的时间)
+			CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
+			// 按新的cronExpression表达式构建一个新的trigger
+			CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobClassName, jobGroupName)
+					.withSchedule(scheduleBuilder).build();
+			//构建Jk_Job
+			JkJob job = new JkJob();
+			job.setNewId();
+			job.setJkJobName("测试");
+			job.setJkJobType(JkJobType.common.ordinal());
+			job.setJobName("测试");
+			job.setJobGroup("test");
+			job.setTriggerName("测试");
+			job.setTriggerGroup("test");
+			job.setMemberId(AppContext.getCurrentUser().getId());
+			job.setCreateDate(new Date());
+			job.setJobName("测试");
+			job.setDeleted(false);
+			DBAgent.save(job);
+			try {
+				scheduler.scheduleJob(jobDetail, trigger);
+			} catch (SchedulerException e) {
+				throw new Exception("创建定时任务失败");
+			}
+		}catch(Exception e){
+			res.put("success",false);
+			res.put("success",e.getMessage());
+			e.printStackTrace();
 		}
-		*/
-		QuartzHolder.newCronQuartzJob(jobGroupName, jobClassName, cronExpression,
-                new Date(), null, jobClassName, new HashMap<String, String>());
-		return true;
+		/*QuartzHolder.newCronQuartzJob(jobGroupName, jobClassName, cronExpression,
+                new Date(), null, jobClassName, new HashMap<String, String>());*/
+		res.put("success",true);
+		return res;
 	}
 	
 	/**
@@ -163,9 +170,9 @@ public class JkManager {
         return true;
     }
 
-	public static QuartzJobProxy getClass(String classname) throws Exception {
-		Class<?> class1 = Class.forName(classname);
-		return (QuartzJobProxy) class1.newInstance();
+	public static <T extends Job> Class<T> getClass(String classname) throws Exception {
+		Class<T> clazz = (Class<T>)Class.forName(classname);
+		return clazz;
 	}
 
 }

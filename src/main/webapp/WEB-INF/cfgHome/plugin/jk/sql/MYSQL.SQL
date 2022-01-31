@@ -10,6 +10,7 @@ CREATE TABLE JK_JOB (
   	ID BIGINT(20)                     NOT NULL                   COMMENT '主键id',
     JK_JOB_NAME VARCHAR(255)          NOT NULL                   COMMENT '',
     JK_JOB_TYPE SMALLINT(4)           NOT NULL                   COMMENT '',
+    SCHED_NAME VARCHAR(255)           DEFAULT NULL               COMMENT '',
     JOB_NAME VARCHAR(255)             DEFAULT NULL               COMMENT '',
     JOB_GROUP VARCHAR(255)            DEFAULT NULL               COMMENT '',
     TRIGGER_NAME VARCHAR(255)         DEFAULT NULL               COMMENT '',
