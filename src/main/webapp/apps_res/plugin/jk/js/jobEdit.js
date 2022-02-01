@@ -1,49 +1,64 @@
 var configEditor = (function () {
 	var ajax = new jkManager();
-	var jobMap = {};
-	var isNew = true;//是否新建
-	var jobSelected;
+	var job = {};
 	function _initPage(params){
-		
+		var transParams = window.parentDialogObj["editJobDialog"].getTransParams()
+		job = transParams.job;
+		$("#jobId").val(job.jobId);
+		$("#jobName").val(job.jobName);
+		$("#jobType").val(job.jobType);
+		$("#jobDetailName").val(job.jobDetailName);
+		$("#jobClassName").val(job.jobClassName);
+		$("#groupName").val(job.groupName);
+		$("#jobCronExpression").val(job.jobCronExpression);
 	}
-	function _init(selecteds){
-		var options = [];
-		for (var index = 0; index < selecteds.length; index++) {
-			var jobDetailName = selecteds[index];
-			jobMap[job.jobDetailName] = jobDetailName;
-		}
-		jobSelected = new CtpUiComSelect($("#jobDetailName").get(0), { options: options });
+	function _init(){
+
 	}
 	/**
 	 * 校验页面参数，校验成功返回 数据对象，校验失败返回false
 	 */
-	function _validateAndGet(onlyGet){
+	function _validateAndGet(func,callback){
 		//var selectedJob = jobMap[jobSelected.getSelValue()[0]];
 		var job = {};
+		job.jobId = $("#jobId").val();
+		job.jobName = $("#jobName").val();
+		job.jobType = $("#jobType").val();
 		job.jobDetailName = $("#jobDetailName").val();
-		job.groupName = $("#groupName").val();
-		job.jobCronExpression = $("#jobCronExpression").val();
-		return job;
+		job.jobClassName = $("#jobClassName").val();
+		job.jobGroupName = $("#groupName").val();
+		job.cronExpression = $("#jobCronExpression").val();
+		ajax.jobExist(job.jobDetailName,job.groupName,{
+			success:function (rs) {
+				if(!rs.success){
+					$.error(rs.msg);
+				}else{
+					func(job,callback);
+				}
+			}
+		});
 	}
 	var saving = false;
+	function saveData(data,callback){
+		if(!data || saving){
+			return;
+		}
+		saving = true;
+		ajax.jobSave(JSON.stringify(data),{
+			success:function (rs) {
+				saving = false;
+				if(!rs.success){
+					$.error(rs.msg);
+					return;
+				}
+				callback();
+			}
+		});
+	}
 	return {
 		init: _initPage,
 		save:function (callback){
-			var data = _validateAndGet(false);
-			if(!data || saving){
-				return;
-			}
-			saving = true;
-			ajax.addJob(data.jobDetailName,data.groupName,data.jobCronExpression,{
-				success:function (rs) {
-					saving = false;
-					if(!rs.success){
-						$.error(rs.msg);
-						return;
-					}
-					callback();
-				}
-			});
+			_validateAndGet(saveData,callback);
 		},
 		cancel:function (callback){
 			

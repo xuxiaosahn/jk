@@ -4,7 +4,9 @@ import org.quartz.Trigger.TriggerState;
 
 public class QuartzJobsVO {
 	
-	private String jobKey;
+	private Long jobId;
+	private String jobName;
+	private Integer jobType;
 	private String jobDetailName;
     private String jobCronExpression;
     private String timeZone;
@@ -14,11 +16,23 @@ public class QuartzJobsVO {
     private String triggerGroup;
     private TriggerState state;
     
-	public String getJobKey() {
-		return jobKey;
+	public Long getJobId() {
+		return jobId;
 	}
-	public void setJobKey(String jobKey) {
-		this.jobKey = jobKey;
+	public void setJobId(Long jobId) {
+		this.jobId = jobId;
+	}
+	public String getJobName() {
+		return jobName;
+	}
+	public void setJobName(String jobName) {
+		this.jobName = jobName;
+	}
+	public Integer getJobType() {
+		return jobType;
+	}
+	public void setJobType(Integer jobType) {
+		this.jobType = jobType;
 	}
 	public String getJobDetailName() {
 		return jobDetailName;

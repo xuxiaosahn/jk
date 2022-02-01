@@ -11,6 +11,24 @@
 </head>
 <body id="body" class="h100b">
        <div class="form_obj" style="width: 520px;padding-top: 20px;">
+		   <%--ID--%>
+		   <input type="hidden" id="jobId" name="jobId">
+		   <div class="row_div clearfix small_record fixed_label">
+			   <div class="label_cell mid_label" title="名称">名称:<%--名称--%></div>
+			   <div class="content_cell mid_label">
+				   <div class="common_txtbox_wrap">
+					   <input type="text" id="jobName" name="jobName" />
+				   </div>
+			   </div>
+		   </div>
+		   <div class="row_div clearfix small_record fixed_label">
+			   <div class="label_cell mid_label" title="类型">类型:<%--类型--%></div>
+			   <div class="content_cell mid_label">
+				   <div class="common_txtbox_wrap">
+					   <input type="text" id="jobType" name="jobType" />
+				   </div>
+			   </div>
+		   </div>
 		<div class="row_div clearfix small_record fixed_label">
 			<div class="label_cell mid_label" title="Job名称">Job名称:<%--Job名称--%></div>
 			<div class="content_cell mid_label">

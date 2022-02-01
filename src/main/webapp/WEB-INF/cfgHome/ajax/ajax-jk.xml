@@ -5,9 +5,9 @@
 		<operations>
 			<op>getJkList</op>
 			<op>jobPause</op>
-			<op>jobresume</op>
-			<op>addJob</op>
-			<op>jobreschedule</op>
+			<op>jobResume</op>
+			<op>jobSave</op>
+			<op>jobExist</op>
 		</operations>
 	</bean>
 </beans>

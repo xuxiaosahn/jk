@@ -137,20 +137,32 @@ $().ready(function () {
 		gridType : 'autoGrid', // 宽度自适应
         colModel: [{
         	//选择框
-            display: 'jobKey',
-            name: 'jobKey',
+            display: 'jobId',
+            name: 'jobId',
             width: 'smallest',
 			align : 'center',
             type: 'checkbox'
         }, {
-            display: 'GROUP名称',
-            name: 'groupName',
+            display: '名称',
+            name: 'jobName',
             sortable : true,
             width: 'medium',
-			align : 'center'
+            align : 'center'
         }, {
-            display: 'JOB名称',
+            display: '类型',
+            name: 'jobType',
+            sortable : true,
+            width: 'medium',
+            align : 'center'
+        }, {
+            display: 'JobDetail名称',
             name: 'jobDetailName',
+            sortable : true,
+            width: 'medium',
+            align : 'center'
+        }, {
+            display: 'GROUP名称',
+            name: 'groupName',
             sortable : true,
             width: 'medium',
 			align : 'center'
@@ -224,17 +236,22 @@ function addJob(){
 /**
  * 编辑Job
  */
-function editJob(){
-	
+function editJob(job){
+    var rows = grid.grid.getSelectRows();
+    if(rows.length == 0){
+        $.alert("请选择要编辑的数据");//请选择要编辑的数据
+        return;
+    }
+    _editJob(rows[0]);
 }
 
 /**
  * 新建/编辑JOB
  */
-function _editJob(id){
+function _editJob(job){
 	var transParams = {};
-	if(typeof id !== undefined){
-		transParams.id = id;
+	if(typeof job !== undefined){
+		transParams.job = job;
 	}
 	var topWin = getCtpTop();
 	var editJobDialog = topWin.$.dialog({
@@ -300,17 +317,21 @@ function pauseJob(){
     var confirm = $.confirm({
         'msg': "是否进行暂停操作?",
         ok_fn: function () {
-            callBackendMethod("jkManager", "jobPause", rows[0].jobKey,rows[0].groupName,{
-                success : function(returnVal) {
-                    $.messageBox({
-                        'title':'提示框',
-                        'type': 0,
-                        'msg': '暂停成功',
-                        'imgType':0,
-                        ok_fn:function(){
-                            _doRelaod();
-                        }
-                    });
+            callBackendMethod("jkManager", "jobPause", rows[0].jobDetailName,rows[0].groupName,{
+                success : function(res) {
+                    if (res.success){
+                        $.messageBox({
+                            'title':'提示框',
+                            'type': 0,
+                            'msg': '暂停成功',
+                            'imgType':0,
+                            ok_fn:function(){
+                                _doRelaod();
+                            }
+                        });
+                    }else{
+                        $.error(res.msg);
+                    }
                 }
             });
         }
@@ -333,17 +354,21 @@ function resumeJob(){
     var confirm = $.confirm({
         'msg': "是否进行恢复操作?",
         ok_fn: function () {
-            callBackendMethod("jkManager", "jobresume", rows[0].jobKey,rows[0].groupName,{
-                success : function(returnVal) {
-                    $.messageBox({
-                        'title':'提示框',
-                        'type': 0,
-                        'msg': '恢复成功',
-                        'imgType':0,
-                        ok_fn:function(){
-                            _doRelaod();
-                        }
-                    });
+            callBackendMethod("jkManager", "jobResume", rows[0].jobDetailName,rows[0].groupName,{
+                success : function(res) {
+                    if (res.success){
+                        $.messageBox({
+                            'title':'提示框',
+                            'type': 0,
+                            'msg': '恢复成功',
+                            'imgType':0,
+                            ok_fn:function(){
+                                _doRelaod();
+                            }
+                        });
+                    }else{
+                        $.error(res.msg);
+                    }
                 }
             });
         }
