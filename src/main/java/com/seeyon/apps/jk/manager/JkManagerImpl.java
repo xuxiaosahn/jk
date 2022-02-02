@@ -13,8 +13,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.*;
 import org.quartz.impl.JobDetailImpl;
+import org.songjian.utils.StringUtils;
 
 import javax.inject.Inject;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class JkManagerImpl implements JkManager{
@@ -42,11 +44,45 @@ public class JkManagerImpl implements JkManager{
 	 * @return
 	 * @throws SchedulerException
 	 */
-	public FlipInfo getJkList(FlipInfo flipInfo, Map<String, String> query) throws SchedulerException {
+	public FlipInfo getJkList(FlipInfo flipInfo, Map<String, Object> query) throws Exception {
 		//List<String> triggerGroupNames = scheduler.getTriggerGroupNames();
 		StringBuilder hql = new StringBuilder();
 		hql.append("FROM JkJob WHERE deleted = 0 ");
-		//TODO 根据query参数拼接hql语句
+		//根据query参数拼接hql语句
+		if(query.containsKey("jobName")){
+			if(StringUtils.isBlank(MapUtils.getString(query,"jobName"))){
+				query.remove("jobName");
+			}else {
+				hql.append("AND jkJobName LIKE :jobName");
+				query.put("jobName", "%" + query.get("jobName") + "%");
+			}
+		}else if(query.containsKey("jobDetailName")){
+			if(StringUtils.isBlank(MapUtils.getString(query,"jobDetailName"))){
+				query.remove("jobDetailName");
+			}else {
+				hql.append("AND jobName LIKE :jobDetailName");
+				query.put("jobDetailName", "%" + query.get("jobDetailName") + "%");
+			}
+		}else if(query.containsKey("jobGroupName")){
+			if(StringUtils.isBlank(MapUtils.getString(query,"jobGroupName"))){
+				query.remove("jobGroupName");
+			}else {
+				hql.append("AND jobGroup LIKE :jobGroupName");
+				query.put("jobGroupName", "%" + query.get("jobGroupName") + "%");
+			}
+		}else if(query.containsKey("jobType")){
+			hql.append("AND jkJobType = :jobType");
+			query.put("jobType",MapUtils.getInteger(query,"jobType"));
+		}else if(query.containsKey("createDate")){//TODO 日期处理
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			hql.append("AND createDate BETWEEN :fromDate AND :toDate ");
+			String dateArr[] = MapUtils.getString(query,"createDate").split("#");
+			String fromDate = dateArr[0];
+			String toDate = dateArr[1];
+			query.remove("createDate");
+			query.put("fromDate",sdf.parse(fromDate));
+			query.put("toDate",sdf.parse(toDate));
+		}
 		hql.append(" ORDER BY createDate DESC");
 		List<JkJob> jkJobs = DBAgent.find(hql.toString(), query, flipInfo);
 		List<QuartzJobsVO> quartzJobsVOList = new ArrayList<>();
@@ -236,6 +272,23 @@ public class JkManagerImpl implements JkManager{
         }
         return true;
     }
+
+	/**
+	 *
+	 * @param ids id数组
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public Map<String, Object> jobBatchDelete(Long[] ids) throws Exception {
+		for(Long id : ids){
+			JkJob jkJob = jkDao.get(id);
+			jobDelete(jkJob.getJobName(),jkJob.getJobGroup());
+			jkJob.setDeleted(true);
+			DBAgent.update(jkJob);
+		}
+		return new HashMap<>();
+	}
 
 	private static <T extends Job> Class<T> getClass(String classname) throws Exception {
 		Class<T> clazz = (Class<T>)Class.forName(classname);

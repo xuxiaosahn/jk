@@ -7,8 +7,12 @@ var toolbar;
 /** 数列表表对象 */
 var grid;
 
-/** 当前选择的实体类型*/
-var currentEntityType;
+var proce; //进度条
+function closeProce(){
+    if(proce){
+        proce.close();
+    }
+}
 
 /**
  * 页面初始化
@@ -21,6 +25,7 @@ $().ready(function () {
 	toolbarArray.push({id: "edit",name: '编辑',className: "ico16 editor_16",click:editJob});
     toolbarArray.push({id: "pause",name: '暂停',className: "ico16 toback_16",click:pauseJob});
     toolbarArray.push({id: "resume",name: '恢复',className: "ico16 refresh_16",click:resumeJob});
+    toolbarArray.push({id: "delete",name: '删除',className: "ico16 del_16",click:deleteJob});
 
     //设置工具栏
     toolbar = $("#toolbar").toolbar({
@@ -38,97 +43,93 @@ $().ready(function () {
         searchHandler: function(){
         	//查询条件对象
             var conditionObj = new Object();
-            conditionObj.entityType = currentEntityType
             var choose = $('#'+searchobj.p.id).find("option:selected").val();
-            //实体名称
-            if(choose === 'entityName'){
-            	conditionObj.entityName = $('#entityName').val();
+            if(choose === 'jobName'){
+            	conditionObj.jobName = $('#jobName').val();
             }
-            //实体编码
-            else if(choose === 'entityCode'){
-            	conditionObj.entityCode = $('#entityCode').val();
+            else if(choose === 'jobDetailName'){
+            	conditionObj.jobDetailName = $('#jobDetailName').val();
             }
-            //操作类型
-            else if(choose === 'synType'){
-            	conditionObj.synType = $('#synType').val();
+            else if(choose === 'jobGroupName'){
+                conditionObj.jobGroupName = $('#jobGroupName').val();
             }
-            //同步时间
-            else if(choose === 'synDate'){
-                var fromDate = $('#from_synDate').val();
-                var toDate = $('#to_synDate').val();
+            else if(choose === 'jobType'){
+            	conditionObj.jobType = $('#jobType').val();
+            }
+            else if(choose === 'createDate'){
+                var fromDate = $('#from_createDate').val();
+                var toDate = $('#to_createDate').val();
+                if (fromDate == ""){
+                    $.alert("开始时间不能为空");
+                    return;
+                }
+                if (toDate == ""){
+                    $.alert("结束时间不能为空");
+                    return;
+                }
                 var date = fromDate+'#'+toDate;
-                conditionObj.synDate = date;
+                conditionObj.createDate = date;
                 if(fromDate != "" && toDate != "" && fromDate > toDate){
-                    $.alert("开始时间不能早于结束时间!");
+                    $.alert("开始时间不能晚于结束时间!");
                     return;
                 }
             }
             //同步状态
-            else if(choose === 'synState'){ //流程状态
-            	conditionObj.synState=$('#synState').val();
+            else if(choose === 'triggerState'){ //流程状态
+            	conditionObj.triggerState=$('#triggerState').val();
             }
-            
             var val = searchobj.g.getReturnValue();
             if(val !== null){
                 $("#jkList").ajaxgridLoad(conditionObj);
             }
         },
         conditions: [{
-        	//实体名称
-            id: 'entityName',
-            name: 'entityName',
+        	//任务名称
+            id: 'jobName',
+            name: 'jobName',
             type: 'input',
             text: '名称',
-            value: 'entityName',
+            value: 'jobName',
             maxLength:100
         },{
-        	//实体编码
-            id: 'entityCode',
-            name: 'entityCode',
+        	//jobDetailName
+            id: 'jobDetailName',
+            name: 'jobDetailName',
             type: 'input',
-            text: '编码',
-            value: 'entityCode',
+            text: 'jobDetailName',
+            value: 'jobDetailName',
             maxLength:100
         },{
-        	//操作类型
-            id: 'synType',
-            name: 'synType',
+            //jobGroupName
+            id: 'jobGroupName',
+            name: 'jobGroupName',
+            type: 'input',
+            text: '组名称',
+            value: 'jobGroupName',
+            maxLength:100
+        },{
+        	//jobType
+            id: 'jobType',
+            name: 'jobType',
             type: 'select',
-            text: '操作类型',
-            value: 'synType',
+            text: '类型',
+            value: 'jobType',
             items: [{
-                text:  '新增',
-                value: '1'
+                text:  '原生quartz',
+                value: 0
             }, {
-                text:  '更新',
-                value: '2'
-            }, {
-                text:  '删除',
-                value: '3'
+                text:  'CTP quartz',
+                value: 1
             }]
         },{
-        	//同步时间
-            id: 'synDate',
-            name: 'synDate',
+        	//创建时间
+            id: 'createDate',
+            name: 'createDate',
             type: 'datemulti',
-            text: '同步时间',
-            value: 'synDate',
-            ifFormat:'%Y-%m-%d',
-            dateTime: false
-        },{
-        	//同步状态
-        	id:'synState',
-        	name:'synState',
-        	type:'select',
-        	text:'同步状态',
-        	value: 'synState',
-            items:[{
-            	text:'失败',
-            	value:'-1'
-            },{
-            	text:'成功',
-            	value:'1'
-            }]
+            text: '创建时间',
+            value: 'createDate',
+            ifFormat:'%Y-%m-%d %H:%M',
+            dateTime: true
         }]
     });
     
@@ -185,6 +186,9 @@ $().ready(function () {
             width: 'small',
 			align : 'center'
         }],
+        dblclick: function(data, r, cIndex){
+                _editJob(data);
+        },
         render : rend,
         showTableToggleBtn: true,
         parentId: $('.layout_center').eq(0).attr('id'),
@@ -208,22 +212,32 @@ $().ready(function () {
 /**
  * 列表加载 回调函数
  */
-function rend(txt, data, r, c) {
-    if(c === 1){
+function rend(txt,rowData, rowIndex, colIndex,colObj) {
+    if(colIndex === 1){
     	//标题列加深
 	    txt="<font class='red-input'>"+txt+"</font>";
         return txt;
-    }else if(c===3){
-    	return txt;
-    }else if(c === 4){
-       
+    }else {
+        if (colObj.name === "jobType") {
+            if (txt == 0) {
+                txt = "原生quartz"
+            } else if (txt == 1) {
+                txt = "CTP quartz"
+            }
+        }else if (colObj.name === "state") {
+            if (txt === "NORMAL") {
+                txt = "<span class=\"ico16 online_news_16\"></span>"+"运行中";
+            } else if (txt === "PAUSED") {
+                txt = "<span class=\"ico16 flow_pend_16\"></span>"+"暂停";
+            } else if (txt === "COMPLETE") {
+                txt = "<span class=\"ico16 flow_end_16\"></span>" + "完成";
+            } else if (txt === "ERROR") {
+                txt = "<span class=\"ico16 h_risk_16\"></span>"+"错误";
+            } else if (txt === "BLOCKED") {
+                txt = "<span class=\"ico16 unstart_16\"></span>"+"阻塞";
+            }
+        }
         return txt;
-    }else if(c === 5){
-    	return txt;
-    }else if (c === 6){
-    	return txt;
-    }else{
-    	return txt;
     }
 } 
 
@@ -243,6 +257,40 @@ function editJob(job){
         return;
     }
     _editJob(rows[0]);
+}
+/**
+ * 编辑Job
+ */
+function deleteJob(){
+    var rows = grid.grid.getSelectRows();
+    if(rows.length == 0){
+        $.alert("请选择要删除的数据");//请选择要编辑的数据
+        return;
+    }
+    var ids = new Array();
+    rows.forEach(function (e){
+        ids.push(e.jobId);
+    })
+    $.confirm({
+        'msg': "确定要删除吗？删除后不可恢复！",
+        ok_fn: function () {
+            proce = $.progressBar({text:"正在删除任务"});
+            callBackendMethod("jkManager","jobBatchDelete",ids,{
+                success:function (rs) {
+                    if(rs.success){
+                        $.infor("删除数据成功");//删除数据成功
+                    }else{
+                        $.error(rs.msg);
+                    }
+                    closeProce();
+                    _doRelaod();
+                }
+            });
+        },
+        cancel_fn:function(){
+
+        }
+    });
 }
 
 /**
@@ -317,9 +365,11 @@ function pauseJob(){
     var confirm = $.confirm({
         'msg': "是否进行暂停操作?",
         ok_fn: function () {
+            proce = $.progressBar({text:"正在暂停任务"});
             callBackendMethod("jkManager", "jobPause", rows[0].jobDetailName,rows[0].groupName,{
                 success : function(res) {
                     if (res.success){
+                        closeProce();
                         $.messageBox({
                             'title':'提示框',
                             'type': 0,
@@ -354,8 +404,10 @@ function resumeJob(){
     var confirm = $.confirm({
         'msg': "是否进行恢复操作?",
         ok_fn: function () {
+            proce = $.progressBar({text:"正在恢复任务"});
             callBackendMethod("jkManager", "jobResume", rows[0].jobDetailName,rows[0].groupName,{
                 success : function(res) {
+                    closeProce();
                     if (res.success){
                         $.messageBox({
                             'title':'提示框',

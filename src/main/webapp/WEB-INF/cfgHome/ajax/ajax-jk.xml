@@ -8,6 +8,7 @@
 			<op>jobResume</op>
 			<op>jobSave</op>
 			<op>jobExist</op>
+			<op>jobBatchDelete</op>
 		</operations>
 	</bean>
 </beans>

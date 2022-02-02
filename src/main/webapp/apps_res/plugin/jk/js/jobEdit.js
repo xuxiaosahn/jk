@@ -4,13 +4,15 @@ var configEditor = (function () {
 	function _initPage(params){
 		var transParams = window.parentDialogObj["editJobDialog"].getTransParams()
 		job = transParams.job;
-		$("#jobId").val(job.jobId);
-		$("#jobName").val(job.jobName);
-		$("#jobType").val(job.jobType);
-		$("#jobDetailName").val(job.jobDetailName);
-		$("#jobClassName").val(job.jobClassName);
-		$("#groupName").val(job.groupName);
-		$("#jobCronExpression").val(job.jobCronExpression);
+		if(job) {
+			$("#jobId").val(job.jobId);
+			$("#jobName").val(job.jobName);
+			$("#jobType").val(job.jobType);
+			$("#jobDetailName").val(job.jobDetailName);
+			$("#jobClassName").val(job.jobClassName);
+			$("#groupName").val(job.groupName);
+			$("#jobCronExpression").val(job.jobCronExpression);
+		}
 	}
 	function _init(){
 

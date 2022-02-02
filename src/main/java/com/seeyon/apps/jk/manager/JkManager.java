@@ -22,7 +22,7 @@ public interface JkManager {
      * @return
      * @throws SchedulerException
      */
-    FlipInfo getJkList(FlipInfo flipInfo, Map<String, String> query) throws SchedulerException;
+    FlipInfo getJkList(FlipInfo flipInfo, Map<String, Object> query) throws Exception;
     /**
      * 挂起
      * @param jobDetailName
@@ -68,4 +68,11 @@ public interface JkManager {
      * @throws Exception
      */
     Map<String, Object> jobDelete(String jobDetailName, String jobGroupName) throws SchedulerException;
+    /**
+     * 删除任务(批量)
+     * @param ids id数组
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> jobBatchDelete(Long[] ids) throws Exception;
 }
