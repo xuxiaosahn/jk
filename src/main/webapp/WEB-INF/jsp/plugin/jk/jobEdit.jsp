@@ -25,9 +25,13 @@
 		   <div class="row_div clearfix small_record fixed_label">
 			   <div class="label_cell mid_label" title="类型"><i class="required">*</i>类型:<%--类型--%></div>
 			   <div class="content_cell mid_label">
-				   <div class="common_txtbox_wrap">
-					   <input type="text" id="jobType" name="jobType" />
-				   </div>
+<%--				   <div class="common_txtbox_wrap">--%>
+<%--					   <input type="text" id="jobType" name="jobType" />--%>
+					   <select name="jobType" id="jobType" onchange="changeType(this)" style="width:100%;margin-right: 2px;height:26px;line-height: 26px;border:1px solid #e4e4e4;">
+						   <option value="0">原生quartz</option>
+						   <option value="1">CTP quartz</option>
+					   </select>
+<%--				   </div>--%>
 			   </div>
 		   </div>
 		<div class="row_div clearfix small_record fixed_label">
@@ -50,7 +54,7 @@
 			<div class="label_cell mid_label" title="CLASS路径"><i class="required">*</i>CLASS路径:<%--CLASS路径--%></div>
 			<div class="content_cell mid_label">
 				<div class="common_txtbox_wrap">
-					<input type="text" id="jobClassName" name="jobClassName" />
+					<input type="text" id="jobClassName" name="jobClassName" <c:if test="${job.jobType==1}">readonly="readonly" disabled="disabled"</c:if>/>
 				</div>
 			</div>
 		</div>
@@ -62,14 +66,22 @@
 				</div>
 			</div>
 		</div>
+			   <div class="row_div clearfix small_record fixed_label">运行参数</div>
 		<div class="row_div clearfix small_record fixed_label">
-			<div class="label_cell mid_label" title="状态">状态:<%--状态--%></div>
-			<div class="content_cell mid_label">
-				<div class="common_txtbox_wrap">
-					<input type="text" id="state" name="state" />
+			<div id='layout' class="comp" comp="type:'layout'">
+				<div class="comp"
+					 comp="type:'breadcrumb',comptype:'location',code:'T1_FormulaManager'"> </div>
+				<div class="layout_north" layout="height:40,sprit:false,border:false">
+					<div id="searchDiv"> </div>
+					<div id="toolbar"> </div>
+				</div>
+				<div class="layout_center over_hidden" layout="border:false"
+					 id="center">
+					<table id="formulaTable" class="flexme3" border="0" cellspacing="0"
+						   cellpadding="0"> </table>
 				</div>
 			</div>
-		</div>		
+		</div>
 	</div>
 </body>
 <script type="text/javascript">

@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>TODO</p>
@@ -13,6 +14,7 @@ import org.quartz.JobExecutionException;
  * @@version 1.0.0
  * @since 2022/1/31
  */
+@Component
 public class CommonJob implements Job {
     private static Log LOG = LogFactory.getLog(CommonJob.class);
 

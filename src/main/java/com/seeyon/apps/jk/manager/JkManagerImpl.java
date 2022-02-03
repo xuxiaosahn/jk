@@ -154,13 +154,13 @@ public class JkManagerImpl implements JkManager{
 		String jobClassName = MapUtils.getString(params,"jobClassName");
 		String jobGroupName = MapUtils.getString(params,"jobGroupName");
 		String cronExpression = MapUtils.getString(params,"cronExpression");
-		Map<String,Object> res = new HashMap<>();
 		// 构建job信息
 		switch (jobType) {
 			case 0:
 				if(scheduler.checkExists(new JobKey(jobDetailName, jobGroupName))){//如果存在不创建
 					break;
 				}
+				//TODO 此处应该有bug，当优化
 				JobDetail jobDetail = JobBuilder.newJob(getClass(jobClassName))
 						.withIdentity(jobDetailName, jobGroupName).build();
 				// 表达式调度构建器(即任务执行的时间)
@@ -176,8 +176,8 @@ public class JkManagerImpl implements JkManager{
 				}
 				break;
 			case 1:
-				QuartzHolder.newCronQuartzJob(jobGroupName, jobClassName, cronExpression,
-						new Date(), null, jobClassName, new HashMap<String, String>());
+				QuartzHolder.newCronQuartzJob(jobGroupName, jobDetailName, cronExpression,
+						new Date(), null, jobDetailName, new HashMap<String, String>());
 				break;
 		}
 		//构建Jk_Job

@@ -66,3 +66,12 @@ var configEditor = (function () {
 		}
 	}
 })();
+function changeType(obj){//类型选择
+	if(obj.value == "1"){
+		$("#jobClassName").val("com.seeyon.ctp.common.quartz.QuartzJobProxy");
+		$("#jobClassName").attr("readonly","readonly").attr("disabled","disabled");
+	}else{
+		$("#jobClassName").val("");
+		$("#jobClassName").removeAttr("disabled").removeAttr("readonly");
+	}
+}

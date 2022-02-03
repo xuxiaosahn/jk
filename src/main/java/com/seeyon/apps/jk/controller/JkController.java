@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.seeyon.apps.jk.manager.JkManager;
 import com.seeyon.apps.jk.po.JkJob;
 import com.seeyon.apps.jk.vo.QuartzJobsVO;
+import com.seeyon.ctp.common.AppContext;
 import com.seeyon.ctp.common.controller.BaseController;
 import com.seeyon.ctp.common.exceptions.BusinessException;
 import com.seeyon.ctp.common.quartz.QuartzListener;
@@ -51,12 +52,17 @@ public class JkController extends BaseController{
 			if(MapUtils.getBoolean(res,"success")){
 				JkJob job = (JkJob)MapUtils.getObject(res,"job");
 				QuartzJobsVO jobsVO = new QuartzJobsVO(job);
+				//取job和trigger的值
 				JobKey jobKey = new JobKey(job.getJobName(),job.getJobGroup());
 				TriggerKey triggerKey = new TriggerKey(job.getTriggerName(),job.getTriggerGroup());
 				CronTrigger trigger = (CronTrigger) QuartzListener.getScheduler().getTrigger(triggerKey);
 				JobDetail jobDetail = QuartzListener.getScheduler().getJobDetail(jobKey);
 				jobsVO.setJobClassName(jobDetail.getJobClass().getName());
 				jobsVO.setJobCronExpression(trigger.getCronExpression());
+				//取运行参数的值，懒得做类型判断，暂且全用String
+				JobDataMap jobDataMap = jobDetail.getJobDataMap();
+
+				Map<String, Job> jobNames = AppContext.getBeansOfType(Job.class);
 				mav.addObject("job",JSON.toJSON(jobsVO));
 			}
 		}
