@@ -23,6 +23,24 @@ public interface JkManager {
      * @throws SchedulerException
      */
     FlipInfo getJkList(FlipInfo flipInfo, Map<String, Object> query) throws Exception;
+
+    /**
+     * 获取参数列表，这里用空结果集，具体数据通过ajax取
+     * @param flipInfo
+     * @param query
+     * @return
+     * @throws Exception
+     */
+    FlipInfo getParams(FlipInfo flipInfo, Map<String, Object> query) throws Exception;
+
+    /**
+     * 实际取参数的方法
+     * @param jobDetailName
+     * @param jobGroupName
+     * @return
+     * @throws SchedulerException
+     */
+    Map<String, Object> jobParams (String jobDetailName, String jobGroupName) throws SchedulerException;
     /**
      * 挂起
      * @param jobDetailName

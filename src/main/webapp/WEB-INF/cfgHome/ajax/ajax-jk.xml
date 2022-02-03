@@ -4,6 +4,8 @@
 		<serviceName>jkManager</serviceName>
 		<operations>
 			<op>getJkList</op>
+			<op>getParams</op>
+			<op>jobParams</op>
 			<op>jobPause</op>
 			<op>jobResume</op>
 			<op>jobSave</op>

@@ -6,8 +6,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="${path}/apps_res/plugin/jk/css/jk.css${ctp:resSuffix()}">
 <script type="text/javascript" src="${path}/ajax.do?managerName=jkManager"></script>
-
 <script type="text/javascript" charset="UTF-8" src="${path}/apps_res/plugin/jk/js/jobEdit.js${ctp:resSuffix()}"></script>
+	<%--引入可编辑列表--%>
+<link rel="stylesheet" type="text/css" href="${path}/common/js/ui/seeEditorTable/css/seeEditorTable.css${ctp:resSuffix()}"/>
+<script src="${path}/common/js/ui/seeEditorTable/js/seeyon.ui.editorTable.min.js${ctp:resSuffix()}"></script>
 <title>任务设置</title>
 </head>
 <body id="body" class="h100b">
@@ -66,21 +68,13 @@
 				</div>
 			</div>
 		</div>
-			   <div class="row_div clearfix small_record fixed_label">运行参数</div>
-		<div class="row_div clearfix small_record fixed_label">
-			<div id='layout' class="comp" comp="type:'layout'">
-				<div class="comp"
-					 comp="type:'breadcrumb',comptype:'location',code:'T1_FormulaManager'"> </div>
-				<div class="layout_north" layout="height:40,sprit:false,border:false">
-					<div id="searchDiv"> </div>
-					<div id="toolbar"> </div>
-				</div>
-				<div class="layout_center over_hidden" layout="border:false"
-					 id="center">
-					<table id="formulaTable" class="flexme3" border="0" cellspacing="0"
-						   cellpadding="0"> </table>
-				</div>
-			</div>
+	    <div class="row_div clearfix small_record fixed_label">
+			<div class="label_cell mid_label">运行参数:</div>
+		</div>
+		<div id = "paramDiv" style="margin-left: 10px;">
+			<div class="toolbar" id="toolbar"></div>
+			<table id="formulaTable" class="flexme3" border="0" cellspacing="0"
+				   cellpadding="0"> </table>
 		</div>
 	</div>
 </body>
@@ -89,7 +83,7 @@
 		// 此处改为直接从controller里取
 		// var transParams = window.parentDialogObj["editJobDialog"].getTransParams();
 		var job = '${job}';
-		configEditor.init(JSON.parse(job));
+		configEditor.init(job?JSON.parse(job):'');
 		window.OK = function (params) {
 			if(params.cancel){
 				return configEditor.cancel(params.callback);

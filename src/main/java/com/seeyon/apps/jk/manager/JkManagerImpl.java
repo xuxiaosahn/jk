@@ -1,5 +1,6 @@
 package com.seeyon.apps.jk.manager;
 
+import com.alibaba.fastjson.JSON;
 import com.seeyon.apps.jk.dao.JkDao;
 import com.seeyon.apps.jk.po.JkJob;
 import com.seeyon.apps.jk.vo.QuartzJobsVO;
@@ -111,7 +112,33 @@ public class JkManagerImpl implements JkManager{
 		flipInfo.setData(quartzJobsVOList);
 		return flipInfo;
 	}
-	
+
+	/**
+	 * 获取参数列表，这里用空结果集，具体数据通过ajax取
+	 *
+	 * @param flipInfo
+	 * @param query
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public FlipInfo getParams(FlipInfo flipInfo, Map<String, Object> query) throws Exception {
+		return new FlipInfo();
+	}
+
+	/**
+	 * 实际取参数的方法
+	 *
+	 * @param jobDetailName
+	 * @param jobGroupName
+	 * @return
+	 * @throws SchedulerException
+	 */
+	@Override
+	public Map<String, Object> jobParams(String jobDetailName, String jobGroupName) throws SchedulerException {
+		return null;
+	}
+
 	/**
 	 * 挂起
 	 * @param jobDetailName
@@ -154,30 +181,50 @@ public class JkManagerImpl implements JkManager{
 		String jobClassName = MapUtils.getString(params,"jobClassName");
 		String jobGroupName = MapUtils.getString(params,"jobGroupName");
 		String cronExpression = MapUtils.getString(params,"cronExpression");
+		String jobParamsStr = MapUtils.getString(params,"jobParams");
+		Map<String, String> jobParams = new HashMap<>();
+		if(StringUtils.isNoBlank(jobParamsStr)){
+			List<Map<String,String>> list = (List<Map<String, String>>) JSON.parse(jobParamsStr);
+			for(Map<String,String> map : list){
+				jobParams.put(map.get("paramName"),map.get("paramValue"));
+			}
+		}
 		// 构建job信息
 		switch (jobType) {
 			case 0:
 				if(scheduler.checkExists(new JobKey(jobDetailName, jobGroupName))){//如果存在不创建
-					break;
-				}
-				//TODO 此处应该有bug，当优化
-				JobDetail jobDetail = JobBuilder.newJob(getClass(jobClassName))
-						.withIdentity(jobDetailName, jobGroupName).build();
-				// 表达式调度构建器(即任务执行的时间)
-				CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
-				// 按新的cronExpression表达式构建一个新的trigger
-				CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailName, jobGroupName)
-						.withSchedule(scheduleBuilder).build();
-				try {
-					scheduler.scheduleJob(jobDetail, trigger);
-				} catch (SchedulerException e) {
-					e.printStackTrace();
-					throw new Exception("创建定时任务失败");
+					JobDetail jobDetail =
+							scheduler.getJobDetail(new JobKey(jobDetailName, jobGroupName));
+					jobDetail.getJobDataMap().putAll(jobParams);
+					CronTrigger trigger =
+							(CronTrigger) QuartzListener.getScheduler().getTrigger(
+									new TriggerKey(jobDetailName, jobGroupName));
+				}else {
+					//TODO 此处应该有bug，当优化
+					JobDataMap jobDataMap = new JobDataMap();
+					jobDataMap.putAll(jobParams);
+					JobDetail jobDetail = JobBuilder.newJob(getClass(jobClassName))
+							.withIdentity(jobDetailName, jobGroupName)
+							.setJobData(jobDataMap)
+							.build();
+					// 表达式调度构建器(即任务执行的时间)
+					CronScheduleBuilder scheduleBuilder = CronScheduleBuilder
+							.cronSchedule(cronExpression);
+					// 按新的cronExpression表达式构建一个新的trigger
+					CronTrigger trigger = TriggerBuilder.newTrigger()
+							.withIdentity(jobDetailName, jobGroupName)
+							.withSchedule(scheduleBuilder).build();
+					try {
+						scheduler.scheduleJob(jobDetail, trigger);
+					} catch (SchedulerException e) {
+						e.printStackTrace();
+						throw new Exception("创建定时任务失败");
+					}
 				}
 				break;
 			case 1:
 				QuartzHolder.newCronQuartzJob(jobGroupName, jobDetailName, cronExpression,
-						new Date(), null, jobDetailName, new HashMap<String, String>());
+						new Date(), null, jobDetailName, jobParams);
 				break;
 		}
 		//构建Jk_Job

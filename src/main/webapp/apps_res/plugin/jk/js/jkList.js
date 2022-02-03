@@ -298,8 +298,8 @@ function deleteJob(){
  */
 function _editJob(job){
 	var transParams = {};
-	var idStr;
-	if(typeof job !== undefined){
+	var idStr = "";
+	if(job){
 		transParams.id = job.jobId;//这个不用了，留着备忘
         idStr = "&id="+job.jobId;
 	}
@@ -311,7 +311,7 @@ function _editJob(job){
 		targetWindow : topWin,
 		transParams : transParams,
 		width : 540,
-		height : 400,
+		height : 600,
 	    closeParam:{
 	        'show':true,
 	        autoClose:false,

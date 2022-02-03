@@ -2,6 +2,7 @@ package com.seeyon.apps.jk.vo;
 
 import com.seeyon.apps.jk.po.JkJob;
 import org.quartz.Trigger.TriggerState;
+import java.util.Map;
 
 public class QuartzJobsVO {
 	
@@ -16,6 +17,7 @@ public class QuartzJobsVO {
     private String triggerName;
     private String triggerGroup;
     private TriggerState state;
+    private Map<String, String> jobParams;
 
     public QuartzJobsVO(){
 
@@ -97,5 +99,10 @@ public class QuartzJobsVO {
 	public void setState(TriggerState state) {
 		this.state = state;
 	}
-    
+	public Map<String, String> getJobParams() {
+		return jobParams;
+	}
+	public void setJobParams(Map<String, String> jobParams) {
+		this.jobParams = jobParams;
+	}
 }

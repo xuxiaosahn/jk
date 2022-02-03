@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.Map;
 
 public class JkController extends BaseController{
@@ -61,7 +62,13 @@ public class JkController extends BaseController{
 				jobsVO.setJobCronExpression(trigger.getCronExpression());
 				//取运行参数的值，懒得做类型判断，暂且全用String
 				JobDataMap jobDataMap = jobDetail.getJobDataMap();
-
+				if(jobDataMap.getKeys().length>0) {
+					Map<String,String> tempMap = new HashMap<>();
+					for (String key : jobDataMap.getKeys()) {
+						tempMap.put(key, jobDataMap.getString(key));
+					}
+					jobsVO.setJobParams(tempMap);
+				}
 				Map<String, Job> jobNames = AppContext.getBeansOfType(Job.class);
 				mav.addObject("job",JSON.toJSON(jobsVO));
 			}
