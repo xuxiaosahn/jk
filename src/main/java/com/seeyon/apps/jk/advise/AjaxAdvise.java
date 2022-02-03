@@ -20,7 +20,7 @@ public class AjaxAdvise {
     public Object around(ProceedingJoinPoint pjp){
         Map<String,Object> res = new HashMap<>();
         try{
-            pjp.proceed();
+            res = (Map<String, Object>) pjp.proceed();
             res.put("success",true);
         }catch (Throwable th) {
             res.put("success",false);

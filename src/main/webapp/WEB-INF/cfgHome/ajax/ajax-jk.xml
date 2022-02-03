@@ -9,6 +9,7 @@
 			<op>jobSave</op>
 			<op>jobExist</op>
 			<op>jobBatchDelete</op>
+			<op>jobById</op>
 		</operations>
 	</bean>
 </beans>

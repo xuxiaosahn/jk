@@ -1,9 +1,8 @@
 var configEditor = (function () {
 	var ajax = new jkManager();
-	var job = {};
-	function _initPage(params){
+	function _initPage(job){
 		var transParams = window.parentDialogObj["editJobDialog"].getTransParams()
-		job = transParams.job;
+		//job = transParams.job;
 		if(job) {
 			$("#jobId").val(job.jobId);
 			$("#jobName").val(job.jobName);
@@ -63,18 +62,7 @@ var configEditor = (function () {
 			_validateAndGet(saveData,callback);
 		},
 		cancel:function (callback){
-			
+			callback();
 		}
 	}
 })();
-$(function () {
-	var transParams = window.parentDialogObj["editJobDialog"].getTransParams();
-	configEditor.init(transParams);
-	window.OK = function (params) {
-		if(params.cancel){
-			return configEditor.cancel(params.callback);
-		}else{
-			return configEditor.save(params.callback);
-		}
-	};
-});

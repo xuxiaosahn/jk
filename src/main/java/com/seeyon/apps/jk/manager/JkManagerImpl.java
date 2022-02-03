@@ -274,6 +274,18 @@ public class JkManagerImpl implements JkManager{
     }
 
 	/**
+	 * @param id 主键
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public Map<String, Object> jobById(Long id) throws Exception {
+		Map<String, Object> res = new HashMap<>();
+		res.put("job",jkDao.get(id));
+		return res;
+	}
+
+	/**
 	 *
 	 * @param ids id数组
 	 * @return

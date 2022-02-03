@@ -1,5 +1,6 @@
 package com.seeyon.apps.jk.vo;
 
+import com.seeyon.apps.jk.po.JkJob;
 import org.quartz.Trigger.TriggerState;
 
 public class QuartzJobsVO {
@@ -15,6 +16,20 @@ public class QuartzJobsVO {
     private String triggerName;
     private String triggerGroup;
     private TriggerState state;
+
+    public QuartzJobsVO(){
+
+	}
+
+	public QuartzJobsVO(JkJob jkJob){
+		this.jobId = jkJob.getId();
+		this.jobName = jkJob.getJkJobName();
+		this.jobType = jkJob.getJkJobType();
+		this.jobDetailName = jkJob.getJobName();
+		this.groupName = jkJob.getJobGroup();
+		this.triggerName = jkJob.getTriggerName();
+		this.triggerGroup = jkJob.getTriggerGroup();
+	}
     
 	public Long getJobId() {
 		return jobId;

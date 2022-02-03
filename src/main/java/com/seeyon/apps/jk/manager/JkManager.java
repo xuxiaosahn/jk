@@ -75,4 +75,12 @@ public interface JkManager {
      * @throws Exception
      */
     Map<String, Object> jobBatchDelete(Long[] ids) throws Exception;
+
+    /**
+     * 根据ID获取
+     * @return
+     * @throws Exception
+     * @param id 主键
+     */
+    Map<String, Object> jobById(Long id) throws Exception;
 }

@@ -1,21 +1,65 @@
 package com.seeyon.apps.jk.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.servlet.ModelAndView;
-
+import com.alibaba.fastjson.JSON;
+import com.seeyon.apps.jk.manager.JkManager;
+import com.seeyon.apps.jk.po.JkJob;
+import com.seeyon.apps.jk.vo.QuartzJobsVO;
 import com.seeyon.ctp.common.controller.BaseController;
 import com.seeyon.ctp.common.exceptions.BusinessException;
+import com.seeyon.ctp.common.quartz.QuartzListener;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.quartz.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 public class JkController extends BaseController{
+
+	@Inject
+	private JkManager jkManager;
+
+	public JkManager getJkManager() {
+		return jkManager;
+	}
+
+	public void setJkManager(JkManager jkManager) {
+		this.jkManager = jkManager;
+	}
+
 	@Override
 	public ModelAndView index(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		 ModelAndView mav = new ModelAndView("plugin/jk/jkList");
 		return mav;
 	}
-    public ModelAndView	jobEdit(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
-    	ModelAndView mav = new ModelAndView("plugin/jk/jobEdit");
+
+	/**
+	 * 新建/编辑
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+    public ModelAndView	jobEdit(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String id = request.getParameter("id");
+		ModelAndView mav = new ModelAndView("plugin/jk/jobEdit");
+		if(StringUtils.isNotBlank(id)){
+			Map<String, Object> res = jkManager.jobById(Long.parseLong(id));
+			if(MapUtils.getBoolean(res,"success")){
+				JkJob job = (JkJob)MapUtils.getObject(res,"job");
+				QuartzJobsVO jobsVO = new QuartzJobsVO(job);
+				JobKey jobKey = new JobKey(job.getJobName(),job.getJobGroup());
+				TriggerKey triggerKey = new TriggerKey(job.getTriggerName(),job.getTriggerGroup());
+				CronTrigger trigger = (CronTrigger) QuartzListener.getScheduler().getTrigger(triggerKey);
+				JobDetail jobDetail = QuartzListener.getScheduler().getJobDetail(jobKey);
+				jobsVO.setJobClassName(jobDetail.getJobClass().getName());
+				jobsVO.setJobCronExpression(trigger.getCronExpression());
+				mav.addObject("job",JSON.toJSON(jobsVO));
+			}
+		}
 		return mav;
     }
 }

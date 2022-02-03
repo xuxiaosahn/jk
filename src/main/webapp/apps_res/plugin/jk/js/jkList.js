@@ -298,12 +298,14 @@ function deleteJob(){
  */
 function _editJob(job){
 	var transParams = {};
+	var idStr;
 	if(typeof job !== undefined){
-		transParams.job = job;
+		transParams.id = job.jobId;//这个不用了，留着备忘
+        idStr = "&id="+job.jobId;
 	}
 	var topWin = getCtpTop();
 	var editJobDialog = topWin.$.dialog({
-		url : _ctxPath + "/jk.do?method=jobEdit",
+		url : _ctxPath + "/jk.do?method=jobEdit"+idStr,
 		id:"editJobDialog",
 		title : "任务设置",
 		targetWindow : topWin,
