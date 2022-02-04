@@ -47,6 +47,9 @@ public class JkManagerImpl implements JkManager{
 	 */
 	public FlipInfo getJkList(FlipInfo flipInfo, Map<String, Object> query) throws Exception {
 		//List<String> triggerGroupNames = scheduler.getTriggerGroupNames();
+//		System.out.println(scheduler.isStarted());
+//		System.out.println(scheduler.getCurrentlyExecutingJobs());
+//		System.out.println(scheduler.getContext());
 		StringBuilder hql = new StringBuilder();
 		hql.append("FROM JkJob WHERE deleted = 0 ");
 		//根据query参数拼接hql语句
@@ -182,6 +185,9 @@ public class JkManagerImpl implements JkManager{
 		String jobGroupName = MapUtils.getString(params,"jobGroupName");
 		String cronExpression = MapUtils.getString(params,"cronExpression");
 		String jobParamsStr = MapUtils.getString(params,"jobParams");
+		//旧值
+		String jobDetailNameOld = MapUtils.getString(params,"jobDetailNameOld");
+		String jobGroupNameOld = MapUtils.getString(params,"jobGroupNameOld");
 		Map<String, String> jobParams = new HashMap<>();
 		if(StringUtils.isNoBlank(jobParamsStr)){
 			List<Map<String,String>> list = (List<Map<String, String>>) JSON.parse(jobParamsStr);
@@ -189,40 +195,42 @@ public class JkManagerImpl implements JkManager{
 				jobParams.put(map.get("paramName"),map.get("paramValue"));
 			}
 		}
+		JobKey oldJobKey = new JobKey(jobDetailNameOld, jobGroupNameOld);
 		// 构建job信息
 		switch (jobType) {
 			case 0:
-				if(scheduler.checkExists(new JobKey(jobDetailName, jobGroupName))){//如果存在不创建
-					JobDetail jobDetail =
-							scheduler.getJobDetail(new JobKey(jobDetailName, jobGroupName));
-					jobDetail.getJobDataMap().putAll(jobParams);
-					CronTrigger trigger =
-							(CronTrigger) QuartzListener.getScheduler().getTrigger(
-									new TriggerKey(jobDetailName, jobGroupName));
-				}else {
-					//TODO 此处应该有bug，当优化
-					JobDataMap jobDataMap = new JobDataMap();
-					jobDataMap.putAll(jobParams);
-					JobDetail jobDetail = JobBuilder.newJob(getClass(jobClassName))
-							.withIdentity(jobDetailName, jobGroupName)
-							.setJobData(jobDataMap)
-							.build();
-					// 表达式调度构建器(即任务执行的时间)
-					CronScheduleBuilder scheduleBuilder = CronScheduleBuilder
-							.cronSchedule(cronExpression);
-					// 按新的cronExpression表达式构建一个新的trigger
-					CronTrigger trigger = TriggerBuilder.newTrigger()
-							.withIdentity(jobDetailName, jobGroupName)
-							.withSchedule(scheduleBuilder).build();
-					try {
-						scheduler.scheduleJob(jobDetail, trigger);
-					} catch (SchedulerException e) {
-						e.printStackTrace();
-						throw new Exception("创建定时任务失败");
+				if(jobId!=null){
+					if(scheduler.checkExists(oldJobKey)) {//如果存在则删除再新建
+						jobPause(jobDetailNameOld, jobGroupNameOld);
+						jobDelete(jobDetailNameOld, jobGroupNameOld);
 					}
+				}
+				JobDataMap jobDataMap = new JobDataMap();
+				jobDataMap.putAll(jobParams);
+				JobDetail jobDetail = JobBuilder.newJob(getClass(jobClassName))
+						.withIdentity(jobDetailName, jobGroupName)
+						.setJobData(jobDataMap)
+						.build();
+				// 表达式调度构建器(即任务执行的时间)
+				CronScheduleBuilder scheduleBuilder = CronScheduleBuilder
+						.cronSchedule(cronExpression);
+				// 按新的cronExpression表达式构建一个新的trigger
+				CronTrigger trigger = TriggerBuilder.newTrigger()
+						.withIdentity(jobDetailName, jobGroupName)
+						.withSchedule(scheduleBuilder)
+						.build();
+				try {
+					scheduler.scheduleJob(jobDetail, trigger);
+				} catch (SchedulerException e) {
+					e.printStackTrace();
+					throw new Exception("创建定时任务失败");
 				}
 				break;
 			case 1:
+				if(scheduler.checkExists(oldJobKey)) {//如果存在则删除再新建
+					jobPause(jobDetailNameOld, jobGroupNameOld);
+					jobDelete(jobDetailNameOld, jobGroupNameOld);
+				}
 				QuartzHolder.newCronQuartzJob(jobGroupName, jobDetailName, cronExpression,
 						new Date(), null, jobDetailName, jobParams);
 				break;

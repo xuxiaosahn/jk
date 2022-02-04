@@ -16,6 +16,10 @@
        <div class="form_obj" style="width: 520px;padding-top: 20px;">
 		   <%--ID--%>
 		   <input type="hidden" id="jobId" name="jobId">
+		   <%--jobDetailNameOld--%>
+		   <input type="hidden" id="jobDetailNameOld" name="jobDetailNameOld">
+		   <%--groupNameOld--%>
+		   <input type="hidden" id="groupNameOld" name="groupNameOld">
 		   <div class="row_div clearfix small_record fixed_label">
 			   <div class="label_cell mid_label" title="名称"><i class="required">*</i>名称:<%--名称--%></div>
 			   <div class="content_cell mid_label">

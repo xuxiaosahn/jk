@@ -12,6 +12,9 @@ var configEditor = (function () {
 			$("#jobClassName").val(job.jobClassName);
 			$("#groupName").val(job.groupName);
 			$("#jobCronExpression").val(job.jobCronExpression);
+			//旧值，更新的时候根据旧值先删除再新建
+			$("#jobDetailNameOld").val(job.jobDetailName);
+			$("#groupNameOld").val(job.groupName);
 		}
 		$().ready(function () {
 			//初始化toolbar
@@ -106,13 +109,10 @@ var configEditor = (function () {
 		job.jobClassName = $("#jobClassName").val();
 		job.jobGroupName = $("#groupName").val();
 		job.cronExpression = $("#jobCronExpression").val();
+		//旧值
+		job.jobDetailNameOld = $("#jobDetailNameOld").val();
+		job.jobGroupNameOld = $("#groupNameOld").val();
 		if(gridObj.getChangeSubmitData()){
-			// var paramMap = new Map();
-			// var list = new Array();
-			// list = JSON.parse(gridObj.getChangeSubmitData());
-			// list.forEach(function (param) {
-			// 	paramMap.set(param["paramName"],param["paramValue"]);
-			// });
 			job.jobParams = gridObj.getChangeSubmitData()
 		}
 		ajax.jobExist(job.jobDetailName,job.groupName,{

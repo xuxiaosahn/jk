@@ -3,6 +3,7 @@ package com.seeyon.apps.jk.job;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ public class CommonJob implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        System.out.println("执行普通的JOB");
+        JobDataMap data = context.getJobDetail().getJobDataMap();
+        LOG.info("hello "+data.get("name"));
     }
 }
