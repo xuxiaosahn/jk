@@ -293,8 +293,8 @@ public class JkManagerImpl implements JkManager{
 			job.setJobGroup(jobGroupName);
 			job.setTriggerName(jobDetailName);
 			job.setTriggerGroup(jobGroupName);
-			job.setMemberId(AppContext.getCurrentUser().getId());
-			job.setCreateDate(new Date());
+			job.setModifyId(AppContext.getCurrentUser().getId());
+			job.setModifyDate(new Date());
 			job.setDeleted(false);
 			jobreschedule(jobDetailName, jobGroupName, cronExpression);
 			DBAgent.update(job);
