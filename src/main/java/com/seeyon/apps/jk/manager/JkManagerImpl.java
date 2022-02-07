@@ -192,7 +192,9 @@ public class JkManagerImpl implements JkManager{
 		if(StringUtils.isNoBlank(jobParamsStr)){
 			List<Map<String,String>> list = (List<Map<String, String>>) JSON.parse(jobParamsStr);
 			for(Map<String,String> map : list){
-				jobParams.put(map.get("paramName"),map.get("paramValue"));
+				if(StringUtils.isNoBlank(map.get("paramName"))) {
+					jobParams.put(map.get("paramName"), map.get("paramValue"));
+				}
 			}
 		}
 		JobKey oldJobKey = new JobKey(jobDetailNameOld, jobGroupNameOld);
@@ -205,12 +207,14 @@ public class JkManagerImpl implements JkManager{
 						jobDelete(jobDetailNameOld, jobGroupNameOld);
 					}
 				}
-				JobDataMap jobDataMap = new JobDataMap();
-				jobDataMap.putAll(jobParams);
-				JobDetail jobDetail = JobBuilder.newJob(getClass(jobClassName))
-						.withIdentity(jobDetailName, jobGroupName)
-						.setJobData(jobDataMap)
-						.build();
+				JobBuilder jobBuilder = JobBuilder.newJob(getClass(jobClassName))
+						.withIdentity(jobDetailName, jobGroupName);
+				if(MapUtils.isNotEmpty(jobParams)){
+					JobDataMap jobDataMap = new JobDataMap();
+					jobDataMap.putAll(jobParams);
+					jobBuilder = jobBuilder.setJobData(jobDataMap);
+				}
+				JobDetail jobDetail = jobBuilder.build();
 				// 表达式调度构建器(即任务执行的时间)
 				CronScheduleBuilder scheduleBuilder = CronScheduleBuilder
 						.cronSchedule(cronExpression);
@@ -222,8 +226,7 @@ public class JkManagerImpl implements JkManager{
 				try {
 					scheduler.scheduleJob(jobDetail, trigger);
 				} catch (SchedulerException e) {
-					e.printStackTrace();
-					throw new Exception("创建定时任务失败");
+					throw new Exception(e.getMessage());
 				}
 				break;
 			case 1:

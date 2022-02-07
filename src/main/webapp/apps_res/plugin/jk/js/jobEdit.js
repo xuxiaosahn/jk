@@ -1,10 +1,13 @@
 var configEditor = (function () {
 	var ajax = new jkManager();
 	var gridObj;
+	var isNew = true;
 	function _initPage(job){
 		var transParams = window.parentDialogObj["editJobDialog"].getTransParams()
-		//job = transParams.job;
-		if(job) {
+		if(job){
+			isNew = false;
+		}
+		if(!isNew) {
 			$("#jobId").val(job.jobId);
 			$("#jobName").val(job.jobName);
 			$("#jobType").val(job.jobType);
@@ -115,15 +118,20 @@ var configEditor = (function () {
 		if(gridObj.getChangeSubmitData()){
 			job.jobParams = gridObj.getChangeSubmitData()
 		}
-		ajax.jobExist(job.jobDetailName,job.groupName,{
-			success:function (rs) {
-				if(!rs.success){
-					$.error(rs.msg);
-				}else{
-					func(job,callback);
+		if(isNew){
+			ajax.jobExist(job.jobDetailName,job.jobGroupName,{
+				success:function (rs) {
+					if(!rs.success){
+						$.error(rs.msg);
+					}else{
+						func(job,callback);
+					}
 				}
-			}
-		});
+			});
+		}else{
+			func(job,callback);
+		}
+
 	}
 	var saving = false;
 	function saveData(data,callback){
