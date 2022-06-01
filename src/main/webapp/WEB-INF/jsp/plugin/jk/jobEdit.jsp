@@ -10,7 +10,10 @@
 	<%--引入可编辑列表--%>
 <link rel="stylesheet" type="text/css" href="${path}/common/js/ui/seeEditorTable/css/seeEditorTable.css${ctp:resSuffix()}"/>
 <script src="${path}/common/js/ui/seeEditorTable/js/seeyon.ui.editorTable.min.js${ctp:resSuffix()}"></script>
-<title>任务设置</title>
+
+	<script type="text/javascript" charset="UTF-8" src="${path}/common/js/V3X.js${v3x:resSuffix()}"></script>
+
+	<title>任务设置</title>
 </head>
 <body id="body" class="h100b">
        <div class="form_obj" style="width: 520px;padding-top: 20px;">
@@ -83,10 +86,40 @@
 	</div>
 </body>
 <script type="text/javascript">
+	var myFunc = function (){
+		var dialogFun;
+		try {
+			if(getA8Top().$ && getA8Top().$.dialog){
+				dialogFun  = getA8Top().$.dialog;
+			}else if(getA8Top().v3x && getA8Top().v3x.openDialog){
+				dialogFun = getA8Top().v3x.openDialog;
+			}
+		}catch (e) {
+			console.log(e)
+		}
+
+
+		getA8Top().addattachDialog = dialogFun({
+			title: v3x.getMessage("V3XLang.attachent_title"),
+			transParams:{'parentWin':window},
+			// url     : url,
+			url : '${path}/fileUpload.do?type=0&applicationCategory=&extensions=&maxSize=&isEncrypt=false&popupTitleKey=&isA8geniusAdded=false&quantity=30&selectRepeatSkipOrCover=att1&CSRFTOKEN=null&callMethod=func2&firstSave=true',
+			width   : 400,
+			height  : 300,
+			resizable  : "yes"
+		});
+
+
+	}
+	var func2 = function (fileurls,repeat){
+		alert(fileurls);
+	}
+
 	$(function () {
 		// 此处改为直接从controller里取
 		// var transParams = window.parentDialogObj["editJobDialog"].getTransParams();
-		var job = '${job}';
+		// http://localhost:8888/seeyon/fileUpload.do?type=0&applicationCategory=&extensions=&maxSize=&isEncrypt=false&popupTitleKey=&isA8geniusAdded=false&quantity=30&selectRepeatSkipOrCover=att1&CSRFTOKEN=null
+		var job = '${job}';//el
 		configEditor.init(job?JSON.parse(job):'');
 		window.OK = function (params) {
 			if(params.cancel){

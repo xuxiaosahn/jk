@@ -12,11 +12,6 @@ public class TestQuartz implements QuartzJob {
 	public void execute(Map<String, String> params) {
 		// TODO Auto-generated method stub
 		System.out.println("do sth.");
-		try {
-			Thread.sleep(300000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		System.out.println("do sth. end");
 		LOG.info("hello "+params.get("name"));
 	}
